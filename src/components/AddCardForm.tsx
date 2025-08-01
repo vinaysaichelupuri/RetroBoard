@@ -46,9 +46,9 @@ export const AddCardForm: React.FC<AddCardFormProps> = ({ onAddCard, userName, c
     }));
   };
   const categoryOptions = [
-    { value: 'start', label: 'Start', color: 'bg-green-500 hover:bg-green-600' },
-    { value: 'stop', label: 'Stop', color: 'bg-red-500 hover:bg-red-600' },
-    { value: 'continue', label: 'Continue', color: 'bg-blue-500 hover:bg-blue-600' }
+    { value: 'Went well', label: 'Went well', color: 'bg-green-500 hover:bg-green-600' },
+    { value: 'Not went well', label: 'Not went well', color: 'bg-red-500 hover:bg-red-600' },
+    { value: 'Action items', label: 'Action items', color: 'bg-blue-500 hover:bg-blue-600' }
   ];
 
   if (!isExpanded) {
