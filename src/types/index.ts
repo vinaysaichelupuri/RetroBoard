@@ -1,0 +1,43 @@
+export interface RetroCard {
+  id: string;
+  text: string;
+  author: string;
+  authorId: string;
+  category: 'start' | 'stop' | 'continue';
+  timestamp: number;
+  votes: number;
+  votedBy: string[];
+  customFields?: { [key: string]: string };
+}
+
+export interface Participant {
+  id: string;
+  name: string;
+  lastActive: number;
+  isCreator?: boolean;
+}
+
+export interface Room {
+  id: string;
+  name: string;
+  createdAt: number;
+  lastActive: number;
+  creatorId: string;
+  customFields: CustomField[];
+  settings: RoomSettings;
+}
+
+export interface CustomField {
+  id: string;
+  name: string;
+  type: 'text' | 'number' | 'select';
+  options?: string[];
+  required: boolean;
+}
+
+export interface RoomSettings {
+  allowAnonymousCards: boolean;
+  showAuthorToCreator: boolean;
+  sortBy: 'timestamp' | 'votes' | 'author';
+  sortOrder: 'asc' | 'desc';
+}
