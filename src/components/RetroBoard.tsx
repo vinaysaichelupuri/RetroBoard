@@ -9,7 +9,7 @@ import { NamePrompt } from './NamePrompt';
 import { CreatorControls } from './CreatorControls';
 import { CardEditModal } from './CardEditModal';
 import { RetroCard as RetroCardType } from '../types';
-
+import logo from '../assets/retroBoard.png';
 export const RetroBoard: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const [userName, setUserName] = useState<string>('');
@@ -116,7 +116,11 @@ export const RetroBoard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 text-white" />
+                  <img
+                                    src={logo}
+                                    alt="Logo"
+                                    className="w-10 h-10 object-contain"
+                                  />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Retro Board</h1>
@@ -170,8 +174,8 @@ export const RetroBoard: React.FC = () => {
                   ))}
                   {categorizedCards.start.length === 0 && (
                     <div className="bg-green-50 border-2 border-dashed border-green-200 rounded-xl p-6 text-center">
-                      <p className="text-green-600 font-medium">No "Start" cards yet</p>
-                      <p className="text-green-500 text-sm mt-1">Add what the team should start doing</p>
+                      <p className="text-green-600 font-medium">No "Went well" cards yet</p>
+                      <p className="text-green-500 text-sm mt-1">Add what the team is doing good</p>
                     </div>
                   )}
                 </div>
@@ -198,7 +202,7 @@ export const RetroBoard: React.FC = () => {
                   ))}
                   {categorizedCards.stop.length === 0 && (
                     <div className="bg-red-50 border-2 border-dashed border-red-200 rounded-xl p-6 text-center">
-                      <p className="text-red-600 font-medium">No "Stop" cards yet</p>
+                      <p className="text-red-600 font-medium">No "Not went well" cards yet</p>
                       <p className="text-red-500 text-sm mt-1">Add what the team should stop doing</p>
                     </div>
                   )}
@@ -226,8 +230,8 @@ export const RetroBoard: React.FC = () => {
                   ))}
                   {categorizedCards.continue.length === 0 && (
                     <div className="bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl p-6 text-center">
-                      <p className="text-blue-600 font-medium">No "Continue" cards yet</p>
-                      <p className="text-blue-500 text-sm mt-1">Add what the team should continue doing</p>
+                      <p className="text-blue-600 font-medium">No "Action items" cards yet</p>
+                      <p className="text-blue-500 text-sm mt-1">Add what actions need to take</p>
                     </div>
                   )}
                 </div>
