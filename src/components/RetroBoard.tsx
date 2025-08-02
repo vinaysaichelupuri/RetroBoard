@@ -329,7 +329,7 @@ const handleDeleteCard = async (cardId: string) => {
               <div className="space-y-2 text-sm text-gray-600">
                 <p>
                   <span className="font-medium">Total Cards:</span>{" "}
-                  {cards.length}
+                  {cards.filter(card => !card.deleted).length}
                 </p>
                 <p>
                   <span className="font-medium">Your Name:</span> {userName}
