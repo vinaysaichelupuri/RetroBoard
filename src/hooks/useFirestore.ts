@@ -9,12 +9,9 @@ import {
   doc, 
   arrayUnion, 
   arrayRemove,
-  setDoc,
-  getDoc,
-  where
-} from 'firebase/firestore';
+  setDoc} from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { RetroCard, Participant, Room, CustomField, RoomSettings } from '../types';
+import { RetroCard, Participant, Room } from '../types';
 
 export const useRetroCards = (roomId: string, sortBy: 'timestamp' | 'votes' | 'author' = 'timestamp', sortOrder: 'asc' | 'desc' = 'desc') => {
   const [cards, setCards] = useState<RetroCard[]>([]);
@@ -51,7 +48,7 @@ export const useRetroCards = (roomId: string, sortBy: 'timestamp' | 'votes' | 'a
     text: string, 
     author: string, 
     authorId: string,
-    category: 'start' | 'stop' | 'continue',
+    category: 'start' | 'stop' | 'action',
     customFields?: { [key: string]: string }
   ) => {
     if (!roomId || !text.trim()) return;
