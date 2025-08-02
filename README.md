@@ -76,7 +76,7 @@ service cloud.firestore {
 
 1. **Create a Room**: Click "Create New Room" on the homepage or enter a custom room ID
 2. **Join a Room**: Enter your name when prompted
-3. **Add Cards**: Click "Add Retro Card" and select a category (Start, Stop, Continue)
+3. **Add Cards**: Click "Add Retro Card" and select a category (Start, Stop, Action)
 4. **Vote on Cards**: Click the heart icon to vote on cards you find important
 5. **Collaborate**: Share the room URL with team members for real-time collaboration
 

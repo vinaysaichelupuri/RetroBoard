@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
-  MessageSquare,
   Users as UsersIcon,
   RefreshCw,
   Crown,
@@ -90,7 +89,7 @@ export const RetroBoard: React.FC = () => {
 
   const handleAddCard = (
     text: string,
-    category: "start" | "stop" | "continue",
+    category: "start" | "stop" | "action",
     customFields?: { [key: string]: string }
   ) => {
     addCard(text, userName, userId, category, customFields);
@@ -109,6 +108,16 @@ export const RetroBoard: React.FC = () => {
       updateCard(editingCard.id, updates);
     }
   };
+
+const handleDeleteCard = async (cardId: string) => {
+  try {
+    await updateCard(cardId, { deleted: true });
+  } catch (error) {
+    console.error("Failed to delete card:", error);
+  }
+};
+
+
   if (!userName) {
     return <NamePrompt onNameSubmit={handleNameSubmit} roomId={roomId || ""} />;
   }
@@ -139,9 +148,9 @@ export const RetroBoard: React.FC = () => {
     );
   }
   const categorizedCards = {
-    start: cards.filter((card) => card.category === "start"),
-    stop: cards.filter((card) => card.category === "stop"),
-    continue: cards.filter((card) => card.category === "continue"),
+    start: cards.filter((card) => card.category === "start" && !card.deleted),
+    stop: cards.filter((card) => card.category === "stop" && !card.deleted),
+    action: cards.filter((card) => card.category === "action" && !card.deleted),
   };
 
   return (
@@ -212,7 +221,9 @@ export const RetroBoard: React.FC = () => {
                       currentUser={userId}
                       isCreator={isCreator}
                       showAuthorToCreator={room.settings.showAuthorToCreator}
-                      onEdit={isCreator ? handleEditCard : undefined}
+                      onEdit={ card.authorId === userId ? handleEditCard : undefined}
+                      onDelete={handleDeleteCard}
+
                     />
                   ))}
                   {categorizedCards.start.length === 0 && (
@@ -250,7 +261,8 @@ export const RetroBoard: React.FC = () => {
                       currentUser={userId}
                       isCreator={isCreator}
                       showAuthorToCreator={room.settings.showAuthorToCreator}
-                      onEdit={isCreator ? handleEditCard : undefined}
+                      onEdit={card.authorId === userId ? handleEditCard : undefined}
+                      onDelete={handleDeleteCard}
                     />
                   ))}
                   {categorizedCards.stop.length === 0 && (
@@ -270,17 +282,17 @@ export const RetroBoard: React.FC = () => {
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-4 shadow-lg border-l-4 border-blue-500">
                   <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center">
-                    Actions items ({categorizedCards.continue.length})
+                    Actions items ({categorizedCards.action.length})
                   </h2>
                 <AddCardForm
-                    category="continue"
+                    category="action"
                     onAddCard={handleAddCard}
                     userName={userName}
                     customFields={room.customFields}
                   />
                 </div>
                 <div className="space-y-4">
-                  {categorizedCards.continue.map((card) => (
+                  {categorizedCards.action.map((card) => (
                     <RetroCard
                       key={card.id}
                       card={card}
@@ -288,10 +300,11 @@ export const RetroBoard: React.FC = () => {
                       currentUser={userId}
                       isCreator={isCreator}
                       showAuthorToCreator={room.settings.showAuthorToCreator}
-                      onEdit={isCreator ? handleEditCard : undefined}
+                      onEdit={card.authorId === userId ? handleEditCard : undefined}
+                      onDelete={handleDeleteCard}
                     />
                   ))}
-                  {categorizedCards.continue.length === 0 && (
+                  {categorizedCards.action.length === 0 && (
                     <div className="bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl p-6 text-center">
                       <p className="text-blue-600 font-medium">
                         No "Action items" cards yet

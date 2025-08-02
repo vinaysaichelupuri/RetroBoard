@@ -3,11 +3,13 @@ export interface RetroCard {
   text: string;
   author: string;
   authorId: string;
-  category: 'start' | 'stop' | 'continue';
+  category: 'start' | 'stop' | 'action';
   timestamp: number;
   votes: number;
   votedBy: string[];
   customFields?: { [key: string]: string };
+  deleted?: boolean;
+
 }
 
 export interface Participant {

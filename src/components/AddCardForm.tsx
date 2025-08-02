@@ -4,10 +4,10 @@ import { Plus, Send } from 'lucide-react';
 import { CustomField } from '../types';
 
 interface AddCardFormProps {
-  category: 'start' | 'stop' | 'continue';
+  category: 'start' | 'stop' | 'action';
   onAddCard: (
     text: string,
-    category: 'start' | 'stop' | 'continue',
+    category: 'start' | 'stop' | 'action',
     customFields?: { [key: string]: string }
   ) => void;
   userName: string;
@@ -16,7 +16,6 @@ interface AddCardFormProps {
 
 export const AddCardForm: React.FC<AddCardFormProps> = ({
   onAddCard,
-  userName,
   customFields = [],
   category,
 }) => {
