@@ -16,7 +16,7 @@ export const CardEditModal: React.FC<CardEditModalProps> = ({
   onClose
 }) => {
   const [text, setText] = useState(card.text);
-  const [category, setCategory] = useState(card.category);
+  const [category] = useState(card.category);
   const [customFieldValues, setCustomFieldValues] = useState<{ [key: string]: string }>(
     card.customFields || {}
   );
@@ -45,11 +45,6 @@ export const CardEditModal: React.FC<CardEditModalProps> = ({
     }));
   };
 
-  const categoryOptions = [
-    { value: 'start', label: 'Start', color: 'bg-green-500 hover:bg-green-600' },
-    { value: 'stop', label: 'Stop', color: 'bg-red-500 hover:bg-red-600' },
-    { value: 'continue', label: 'Continue', color: 'bg-blue-500 hover:bg-blue-600' }
-  ];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -68,29 +63,6 @@ export const CardEditModal: React.FC<CardEditModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
-            <div className="flex space-x-2">
-              {categoryOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setCategory(option.value as any)}
-                  className={`px-4 py-2 rounded-lg text-white text-sm font-medium transition-all duration-200 ${
-                    category === option.value ? option.color : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Text
-            </label>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -152,13 +124,7 @@ export const CardEditModal: React.FC<CardEditModalProps> = ({
               <Save className="w-4 h-4" />
               <span>Save Changes</span>
             </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
-            >
-              Cancel
-            </button>
+          
           </div>
         </form>
       </div>
