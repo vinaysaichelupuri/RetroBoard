@@ -46,6 +46,7 @@ export const RetroBoard: React.FC = () => {
     userId,
     isCreator
   );
+  console.log("Participants:", participants);
 
   useEffect(() => {
   let storedId = localStorage.getItem(`retroboard_userId_${roomId}`);
@@ -152,6 +153,9 @@ const handleDeleteCard = async (cardId: string) => {
     stop: cards.filter((card) => card.category === "stop" && !card.deleted),
     action: cards.filter((card) => card.category === "action" && !card.deleted),
   };
+    const activeParticipants = participants.filter(
+    p => Date.now() - p.lastActive < 60000 // Active within 2 minutes
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -188,7 +192,7 @@ const handleDeleteCard = async (cardId: string) => {
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <UsersIcon className="w-4 h-4" />
-                <span>{participants.length} active</span>
+                <span>{activeParticipants.length} active</span>
               </div>
             </div>
           </div>
