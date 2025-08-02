@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Crown,
 } from "lucide-react";
+
 import { useRetroCards, useParticipants, useRoom } from "../hooks/useFirestore";
 import { RetroCard } from "./RetroCard";
 import { AddCardForm } from "./AddCardForm";
@@ -48,9 +49,13 @@ export const RetroBoard: React.FC = () => {
   );
 
   useEffect(() => {
-    // Generate a unique user ID for voting
-    const id = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    setUserId(id);
+  let storedId = localStorage.getItem(`retroboard_userId_${roomId}`);
+  if (!storedId) {
+    storedId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem(`retroboard_userId_${roomId}`, storedId);
+  }
+  setUserId(storedId);
+
 
     // Check if user name is stored in localStorage
     const storedName = localStorage.getItem(`retroboard_name_${roomId}`);
@@ -62,10 +67,11 @@ export const RetroBoard: React.FC = () => {
     const storedCreatorId = localStorage.getItem(
       `retroboard_creator_${roomId}`
     );
-    if (storedCreatorId === id) {
+    if (storedCreatorId === storedId) {
       setIsCreator(true);
     }
   }, [roomId]);
+
 
   useEffect(() => {
     // Set creator if room has no creator yet
@@ -182,13 +188,6 @@ export const RetroBoard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Add Card Form */}
-            <AddCardForm
-              onAddCard={handleAddCard}
-              userName={userName}
-              customFields={room.customFields}
-            />
-
             {/* Cards by Category */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Start Cards */}
@@ -197,6 +196,12 @@ export const RetroBoard: React.FC = () => {
                   <h2 className="text-xl font-bold text-green-700 mb-4 flex items-center">
                     Went well ({categorizedCards.start.length})
                   </h2>
+                 <AddCardForm
+                    category="start"
+                    onAddCard={handleAddCard}
+                    userName={userName}
+                    customFields={room.customFields}
+                  />
                 </div>
                 <div className="space-y-4">
                   {categorizedCards.start.map((card) => (
@@ -229,6 +234,12 @@ export const RetroBoard: React.FC = () => {
                   <h2 className="text-xl font-bold text-red-700 mb-4 flex items-center">
                     Not went well ({categorizedCards.stop.length})
                   </h2>
+                  <AddCardForm
+                    category="stop"
+                    onAddCard={handleAddCard}
+                    userName={userName}
+                    customFields={room.customFields}
+                  />
                 </div>
                 <div className="space-y-4">
                   {categorizedCards.stop.map((card) => (
@@ -261,6 +272,12 @@ export const RetroBoard: React.FC = () => {
                   <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center">
                     Actions items ({categorizedCards.continue.length})
                   </h2>
+                <AddCardForm
+                    category="continue"
+                    onAddCard={handleAddCard}
+                    userName={userName}
+                    customFields={room.customFields}
+                  />
                 </div>
                 <div className="space-y-4">
                   {categorizedCards.continue.map((card) => (
@@ -315,7 +332,9 @@ export const RetroBoard: React.FC = () => {
             </div>
           </div>
         </div>
+        
       </div>
+      
 
       {/* Creator Controls */}
       {isCreator && (
