@@ -42,18 +42,6 @@ export const RetroCard: React.FC<RetroCardProps> = ({
     }
   };
 
-  const getCategoryBadgeColor = (category: string) => {
-    switch (category) {
-      case "start":
-        return "bg-green-100 text-green-700";
-      case "stop":
-        return "bg-red-100 text-red-700";
-      case "action":
-        return "bg-blue-100 text-blue-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
 
   return (
     <div
@@ -61,15 +49,8 @@ export const RetroCard: React.FC<RetroCardProps> = ({
         card.category
       )}`}
     >
-      <div className="flex justify-between items-start mb-3">
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(
-            card.category
-          )}`}
-        >
-          {card.category.charAt(0).toUpperCase() + card.category.slice(1)}
-        </span>
-        <div className="flex items-center space-x-2">
+    
+       <div className="flex items-center justify-end mb-3 ml-auto space-x-2">
           {currentUser === card.authorId && (
             <>
               {onEdit && (
@@ -105,9 +86,12 @@ export const RetroCard: React.FC<RetroCardProps> = ({
             <span>{card.votes}</span>
           </button>
         </div>
-      </div>
+     
 
-      <p className="text-gray-800 mb-3 leading-relaxed">{card.text}</p>
+        <p className="text-gray-800 mb-3 leading-relaxed break-words whitespace-pre-wrap">
+        {card.text}
+        </p>
+
 
       {/* Custom Fields */}
       {card.customFields && Object.keys(card.customFields).length > 0 && (
