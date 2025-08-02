@@ -49,9 +49,13 @@ export const RetroBoard: React.FC = () => {
   );
 
   useEffect(() => {
-    // Generate a unique user ID for voting
-    const id = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    setUserId(id);
+  let storedId = localStorage.getItem(`retroboard_userId_${roomId}`);
+  if (!storedId) {
+    storedId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem(`retroboard_userId_${roomId}`, storedId);
+  }
+  setUserId(storedId);
+
 
     // Check if user name is stored in localStorage
     const storedName = localStorage.getItem(`retroboard_name_${roomId}`);
@@ -63,10 +67,11 @@ export const RetroBoard: React.FC = () => {
     const storedCreatorId = localStorage.getItem(
       `retroboard_creator_${roomId}`
     );
-    if (storedCreatorId === id) {
+    if (storedCreatorId === storedId) {
       setIsCreator(true);
     }
   }, [roomId]);
+
 
   useEffect(() => {
     // Set creator if room has no creator yet
