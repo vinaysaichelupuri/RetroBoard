@@ -4,10 +4,12 @@ import { User, ArrowRight } from 'lucide-react';
 interface NamePromptProps {
   onNameSubmit: (name: string) => void;
   roomId: string;
+  boardName: string;
 }
 
-export const NamePrompt: React.FC<NamePromptProps> = ({ onNameSubmit, roomId }) => {
+export const NamePrompt: React.FC<NamePromptProps> = ({ onNameSubmit, roomId,boardName }) => {
   const [name, setName] = useState('');
+  const [addName, setAddName] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +30,21 @@ export const NamePrompt: React.FC<NamePromptProps> = ({ onNameSubmit, roomId }) 
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              Board Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={addName}
+              onChange={(e) => setAddName(e.target.value)}
+              placeholder="Enter board name"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              required
+              autoFocus
+            />
+          </div>
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
               Your Name

@@ -27,6 +27,12 @@ export interface Room {
   creatorId: string;
   customFields: CustomField[];
   settings: RoomSettings;
+  timer?: {
+    isRunning: boolean;
+    startTimestamp: number;
+    duration: number; 
+    isEnded:boolean;
+  };
 }
 
 export interface CustomField {
@@ -38,6 +44,7 @@ export interface CustomField {
 }
 
 export interface RoomSettings {
+  showTimerVoting: boolean;
   allowAnonymousCards: boolean;
   showAuthorToCreator: boolean;
   sortBy: 'timestamp' | 'votes' | 'author';

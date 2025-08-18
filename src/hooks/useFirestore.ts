@@ -164,7 +164,8 @@ export const useRoom = (roomId: string) => {
             allowAnonymousCards: true,
             showAuthorToCreator: true,
             sortBy: 'timestamp',
-            sortOrder: 'desc'
+            sortOrder: 'desc',
+            showTimerVoting: false
           }
         };
         setDoc(roomRef, defaultRoom);
@@ -189,6 +190,11 @@ export const useRoom = (roomId: string) => {
     const roomRef = doc(db, 'rooms', roomId);
     await updateDoc(roomRef, { creatorId });
   };
+  const updateTimer = async (timer: { isRunning: boolean; startTimestamp: number; duration: number ; isEnded:boolean}) => {
+    if (!roomId) return;
+    const roomRef = doc(db, 'rooms', roomId);
+    await updateDoc(roomRef, { timer });
+  };
 
-  return { room, loading, updateRoom, setCreator };
+  return { room, loading, updateRoom, setCreator,updateTimer};
 };

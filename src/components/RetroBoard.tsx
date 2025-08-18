@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Users as UsersIcon,
-  RefreshCw,
-  Crown,
-} from "lucide-react";
+import { Users as UsersIcon, RefreshCw, Crown } from "lucide-react";
 
 import { useRetroCards, useParticipants, useRoom } from "../hooks/useFirestore";
 import { RetroCard } from "./RetroCard";
@@ -13,6 +9,7 @@ import { ParticipantsList } from "./ParticipantsList";
 import { NamePrompt } from "./NamePrompt";
 import { CreatorControls } from "./CreatorControls";
 import { CardEditModal } from "./CardEditModal";
+import { CountdownTimer } from "./Timer";
 import { RetroCard as RetroCardType } from "../types";
 import logo from "../assets/logo.png";
 export const RetroBoard: React.FC = () => {
@@ -20,6 +17,7 @@ export const RetroBoard: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
   const [isCreator, setIsCreator] = useState<boolean>(false);
+  const[boardName,setBoardName] = useState<string>("");
   const [showCreatorControls, setShowCreatorControls] = useState(false);
   const [editingCard, setEditingCard] = useState<RetroCardType | null>(null);
 
@@ -28,6 +26,7 @@ export const RetroBoard: React.FC = () => {
     loading: roomLoading,
     updateRoom,
     setCreator,
+    updateTimer
   } = useRoom(roomId || "");
   const {
     cards,
@@ -44,9 +43,8 @@ export const RetroBoard: React.FC = () => {
     roomId || "",
     userName,
     userId,
-    isCreator
+    isCreator,
   );
-  console.log("Participants:", participants);
 
   useEffect(() => {
   let storedId = localStorage.getItem(`retroboard_userId_${roomId}`);
@@ -71,7 +69,6 @@ export const RetroBoard: React.FC = () => {
       setIsCreator(true);
     }
   }, [roomId]);
-
 
   useEffect(() => {
     // Set creator if room has no creator yet
@@ -120,7 +117,7 @@ const handleDeleteCard = async (cardId: string) => {
 
 
   if (!userName) {
-    return <NamePrompt onNameSubmit={handleNameSubmit} roomId={roomId || ""} />;
+    return <NamePrompt onNameSubmit={handleNameSubmit} roomId={roomId || ""} boardName={boardName || ''} />;
   }
 
   if (roomLoading || cardsLoading) {
@@ -153,8 +150,8 @@ const handleDeleteCard = async (cardId: string) => {
     stop: cards.filter((card) => card.category === "stop" && !card.deleted),
     action: cards.filter((card) => card.category === "action" && !card.deleted),
   };
-    const activeParticipants = participants.filter(
-    p => Date.now() - p.lastActive < 60000 // Active within 2 minutes
+  const activeParticipants = participants.filter(
+    (p) => Date.now() - p.lastActive < 60000 // Active within 2 minutes
   );
 
   return (
@@ -188,11 +185,24 @@ const handleDeleteCard = async (cardId: string) => {
                       <span>Creator</span>
                     </div>
                   )}
+                  <div className="flex items-center space-x-2 mt-2 text-sm text-gray-600">
+                    <UsersIcon className="w-4 h-4" />
+                    <span>{activeParticipants.length} active</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <UsersIcon className="w-4 h-4" />
-                <span>{activeParticipants.length} active</span>
+              <div>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {boardName || "Untitled Board"}
+                  </h1>
+                </div>
+              <div>
+                <div>
+                  {room.settings.showTimerVoting &&
+                    (categorizedCards.start.length > 0 ||
+                      categorizedCards.stop.length > 0 ||
+                      categorizedCards.action.length > 0) &&  <CountdownTimer timer={room.timer} updateTimer={updateTimer} isCreator={isCreator} />}
+                </div>
               </div>
             </div>
           </div>
@@ -209,7 +219,7 @@ const handleDeleteCard = async (cardId: string) => {
                   <h2 className="text-xl font-bold text-green-700 mb-4 flex items-center">
                     Went well ({categorizedCards.start.length})
                   </h2>
-                 <AddCardForm
+                  <AddCardForm
                     category="start"
                     onAddCard={handleAddCard}
                     userName={userName}
@@ -225,9 +235,11 @@ const handleDeleteCard = async (cardId: string) => {
                       currentUser={userId}
                       isCreator={isCreator}
                       showAuthorToCreator={room.settings.showAuthorToCreator}
-                      onEdit={ card.authorId === userId ? handleEditCard : undefined}
+                      onEdit={
+                        card.authorId === userId ? handleEditCard : undefined
+                      }
                       onDelete={handleDeleteCard}
-
+                      votingEnabled={room.settings.showTimerVoting && !!room.timer?.isRunning && !room.timer?.isEnded}
                     />
                   ))}
                   {categorizedCards.start.length === 0 && (
@@ -265,8 +277,11 @@ const handleDeleteCard = async (cardId: string) => {
                       currentUser={userId}
                       isCreator={isCreator}
                       showAuthorToCreator={room.settings.showAuthorToCreator}
-                      onEdit={card.authorId === userId ? handleEditCard : undefined}
+                      onEdit={
+                        card.authorId === userId ? handleEditCard : undefined
+                      }
                       onDelete={handleDeleteCard}
+                      votingEnabled={room.settings.showTimerVoting && !!room.timer?.isRunning && !room.timer?.isEnded}
                     />
                   ))}
                   {categorizedCards.stop.length === 0 && (
@@ -288,7 +303,7 @@ const handleDeleteCard = async (cardId: string) => {
                   <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center">
                     Actions items ({categorizedCards.action.length})
                   </h2>
-                <AddCardForm
+                  <AddCardForm
                     category="action"
                     onAddCard={handleAddCard}
                     userName={userName}
@@ -304,8 +319,11 @@ const handleDeleteCard = async (cardId: string) => {
                       currentUser={userId}
                       isCreator={isCreator}
                       showAuthorToCreator={room.settings.showAuthorToCreator}
-                      onEdit={card.authorId === userId ? handleEditCard : undefined}
+                      onEdit={
+                        card.authorId === userId ? handleEditCard : undefined
+                      }
                       onDelete={handleDeleteCard}
+                      votingEnabled={room.settings.showTimerVoting && !!room.timer?.isRunning && !room.timer?.isEnded}
                     />
                   ))}
                   {categorizedCards.action.length === 0 && (
@@ -333,7 +351,7 @@ const handleDeleteCard = async (cardId: string) => {
               <div className="space-y-2 text-sm text-gray-600">
                 <p>
                   <span className="font-medium">Total Cards:</span>{" "}
-                  {cards.filter(card => !card.deleted).length}
+                  {cards.filter((card) => !card.deleted).length}
                 </p>
                 <p>
                   <span className="font-medium">Your Name:</span> {userName}
@@ -349,9 +367,7 @@ const handleDeleteCard = async (cardId: string) => {
             </div>
           </div>
         </div>
-        
       </div>
-      
 
       {/* Creator Controls */}
       {isCreator && (
