@@ -10,6 +10,7 @@ interface RetroCardProps {
   showAuthorToCreator?: boolean;
   onEdit?: (card: RetroCardType) => void;
   onDelete?: (cardId: string) => void;
+  votingEnabled: boolean;
 }
 
 export const RetroCard: React.FC<RetroCardProps> = ({
@@ -19,7 +20,8 @@ export const RetroCard: React.FC<RetroCardProps> = ({
   isCreator = false,
   showAuthorToCreator = false,
   onEdit,
-  onDelete
+  onDelete,
+  votingEnabled,
 }) => {
   const hasVoted = card.votedBy.includes(currentUser);
   const formatTimestamp = (timestamp: number) => {
@@ -42,38 +44,36 @@ export const RetroCard: React.FC<RetroCardProps> = ({
     }
   };
 
-
   return (
     <div
       className={`border-2 rounded-xl p-4 transition-all duration-200 hover:shadow-lg ${getCategoryColor(
         card.category
       )}`}
     >
-    
-       <div className="flex items-center justify-end mb-3 ml-auto space-x-2">
-          {currentUser === card.authorId && (
-            <>
-              {onEdit && (
-                <button
-                  onClick={() => onEdit(card)}
-                  className="p-1 text-gray-500 hover:bg-gray-200 rounded transition-colors"
-                  title="Edit card"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-              )}
-              {onDelete && (
-                <button
-                  onClick={() => onDelete(card.id)}
-                  className="p-1 text-gray-500 hover:bg-red-100 rounded transition-colors"
-                  title="Delete card"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-            </>
-          )}
-
+      <div className="flex items-center justify-end mb-3 ml-auto space-x-2">
+        {currentUser === card.authorId && (
+          <>
+            {onEdit && (
+              <button
+                onClick={() => onEdit(card)}
+                className="p-1 text-gray-500 hover:bg-gray-200 rounded transition-colors"
+                title="Edit card"
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => onDelete(card.id)}
+                className="p-1 text-gray-500 hover:bg-red-100 rounded transition-colors"
+                title="Delete card"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </>
+        )}
+        {votingEnabled && (
           <button
             onClick={() => onVote(card.id, !hasVoted)}
             className={`flex items-center space-x-1 px-2 py-1 rounded-full text-sm transition-all duration-200 ${
@@ -85,13 +85,12 @@ export const RetroCard: React.FC<RetroCardProps> = ({
             <Heart className={`w-4 h-4 ${hasVoted ? "fill-current" : ""}`} />
             <span>{card.votes}</span>
           </button>
-        </div>
-     
+        )}
+      </div>
 
-        <p className="text-gray-800 mb-3 leading-relaxed break-words whitespace-pre-wrap">
+      <p className="text-gray-800 mb-3 leading-relaxed break-words whitespace-pre-wrap">
         {card.text}
-        </p>
-
+      </p>
 
       {/* Custom Fields */}
       {card.customFields && Object.keys(card.customFields).length > 0 && (
@@ -124,8 +123,3 @@ export const RetroCard: React.FC<RetroCardProps> = ({
     </div>
   );
 };
-
-
-
-
-

@@ -8,8 +8,8 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   preview: {
-    host: true, // binds to 0.0.0.0
-    port: 5173, // optional, Render will use its own port via $PORT
-    allowedHosts: ['retroboard-3vps.onrender.com'], // allow your Render domain
+    host: true,
+    port: 5173,
+    allowedHosts: ['retroboard-3vps.onrender.com'],
   },
 });

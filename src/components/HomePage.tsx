@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {  ArrowRight, Users, Zap, Heart } from 'lucide-react';
-import logo from '../assets/logo.png'; 
+import logo from '../assets/retroBoard.png'; 
 
 export const HomePage: React.FC = () => {
   const [roomId, setRoomId] = useState('');
@@ -24,7 +24,7 @@ export const HomePage: React.FC = () => {
       <div className="container mx-auto px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
              <img
                   src={logo}
                   alt="Logo"
