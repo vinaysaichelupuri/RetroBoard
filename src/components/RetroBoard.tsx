@@ -17,7 +17,6 @@ export const RetroBoard: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
   const [isCreator, setIsCreator] = useState<boolean>(false);
-  const[boardName,setBoardName] = useState<string>("");
   const [showCreatorControls, setShowCreatorControls] = useState(false);
   const [editingCard, setEditingCard] = useState<RetroCardType | null>(null);
 
@@ -26,7 +25,7 @@ export const RetroBoard: React.FC = () => {
     loading: roomLoading,
     updateRoom,
     setCreator,
-    updateTimer
+    updateTimer,
   } = useRoom(roomId || "");
   const {
     cards,
@@ -43,17 +42,18 @@ export const RetroBoard: React.FC = () => {
     roomId || "",
     userName,
     userId,
-    isCreator,
+    isCreator
   );
 
   useEffect(() => {
-  let storedId = localStorage.getItem(`retroboard_userId_${roomId}`);
-  if (!storedId) {
-    storedId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem(`retroboard_userId_${roomId}`, storedId);
-  }
-  setUserId(storedId);
-
+    let storedId = localStorage.getItem(`retroboard_userId_${roomId}`);
+    if (!storedId) {
+      storedId = `user_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+      localStorage.setItem(`retroboard_userId_${roomId}`, storedId);
+    }
+    setUserId(storedId);
 
     // Check if user name is stored in localStorage
     const storedName = localStorage.getItem(`retroboard_name_${roomId}`);
@@ -80,9 +80,12 @@ export const RetroBoard: React.FC = () => {
       setIsCreator(true);
     }
   }, [room, userId, userName, roomId, setCreator]);
-  const handleNameSubmit = (name: string) => {
+  const handleNameSubmit = (name: string, boardNameInput?: string) => {
     setUserName(name);
     localStorage.setItem(`retroboard_name_${roomId}`, name);
+    if (boardNameInput) {
+      updateRoom({ name: boardNameInput });
+    }
   };
 
   const handleAddCard = (
@@ -107,17 +110,27 @@ export const RetroBoard: React.FC = () => {
     }
   };
 
-const handleDeleteCard = async (cardId: string) => {
-  try {
-    await updateCard(cardId, { deleted: true });
-  } catch (error) {
-    console.error("Failed to delete card:", error);
-  }
-};
+  const handleDeleteCard = async (cardId: string) => {
+    try {
+      await updateCard(cardId, { deleted: true });
+    } catch (error) {
+      console.error("Failed to delete card:", error);
+    }
+  };
 
-
-  if (!userName) {
-    return <NamePrompt onNameSubmit={handleNameSubmit} roomId={roomId || ""} boardName={boardName || ''} />;
+  if (
+    !userName ||
+    (!room?.creatorId && !room?.name) ||
+    (isCreator && !room?.name)
+  ) {
+    return (
+      <NamePrompt
+        onNameSubmit={handleNameSubmit}
+        roomId={roomId || ""}
+        isCreatorPrompt={!room?.creatorId || (isCreator && !room?.name)}
+        boardName={room?.name || ""}
+      />
+    );
   }
 
   if (roomLoading || cardsLoading) {
@@ -192,16 +205,22 @@ const handleDeleteCard = async (cardId: string) => {
                 </div>
               </div>
               <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {boardName || "Untitled Board"}
-                  </h1>
-                </div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {room.name || "Untitled Board"}
+                </h1>
+              </div>
               <div>
                 <div>
                   {room.settings.showTimerVoting &&
                     (categorizedCards.start.length > 0 ||
                       categorizedCards.stop.length > 0 ||
-                      categorizedCards.action.length > 0) &&  <CountdownTimer timer={room.timer} updateTimer={updateTimer} isCreator={isCreator} />}
+                      categorizedCards.action.length > 0) && (
+                      <CountdownTimer
+                        timer={room.timer}
+                        updateTimer={updateTimer}
+                        isCreator={isCreator}
+                      />
+                    )}
                 </div>
               </div>
             </div>
@@ -239,7 +258,11 @@ const handleDeleteCard = async (cardId: string) => {
                         card.authorId === userId ? handleEditCard : undefined
                       }
                       onDelete={handleDeleteCard}
-                      votingEnabled={room.settings.showTimerVoting && !!room.timer?.isRunning && !room.timer?.isEnded}
+                      votingEnabled={
+                        room.settings.showTimerVoting &&
+                        !!room.timer?.isRunning &&
+                        !room.timer?.isEnded
+                      }
                     />
                   ))}
                   {categorizedCards.start.length === 0 && (
@@ -281,7 +304,11 @@ const handleDeleteCard = async (cardId: string) => {
                         card.authorId === userId ? handleEditCard : undefined
                       }
                       onDelete={handleDeleteCard}
-                      votingEnabled={room.settings.showTimerVoting && !!room.timer?.isRunning && !room.timer?.isEnded}
+                      votingEnabled={
+                        room.settings.showTimerVoting &&
+                        !!room.timer?.isRunning &&
+                        !room.timer?.isEnded
+                      }
                     />
                   ))}
                   {categorizedCards.stop.length === 0 && (
@@ -323,7 +350,11 @@ const handleDeleteCard = async (cardId: string) => {
                         card.authorId === userId ? handleEditCard : undefined
                       }
                       onDelete={handleDeleteCard}
-                      votingEnabled={room.settings.showTimerVoting && !!room.timer?.isRunning && !room.timer?.isEnded}
+                      votingEnabled={
+                        room.settings.showTimerVoting &&
+                        !!room.timer?.isRunning &&
+                        !room.timer?.isEnded
+                      }
                     />
                   ))}
                   {categorizedCards.action.length === 0 && (
