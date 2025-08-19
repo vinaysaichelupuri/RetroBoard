@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Settings, Plus, X, Save, SortAsc, SortDesc,Pencil, Check ,X as Close } from "lucide-react";
+import { Settings, Plus, X, Save, SortAsc, SortDesc,Pencil, Check ,X as Close , Info} from "lucide-react";
 import { Room, CustomField } from "../types";
 
 interface CreatorControlsProps {
