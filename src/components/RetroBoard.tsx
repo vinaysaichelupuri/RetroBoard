@@ -114,6 +114,15 @@ export const RetroBoard: React.FC = () => {
     }
   };
 
+
+  const getCustomFieldCards = (fieldId: string) =>
+    cards.filter(
+      (card) =>
+        card.customFields &&
+        card.customFields[fieldId] &&
+        !card.deleted
+    );
+
   if (
     !userName ||
     (!room?.creatorId && !room?.name) ||
@@ -157,7 +166,12 @@ export const RetroBoard: React.FC = () => {
   const categorizedCards = {
     start: cards.filter((card) => card.category === "start" && !card.deleted),
     stop: cards.filter((card) => card.category === "stop" && !card.deleted),
-    action: cards.filter((card) => card.category === "action" && !card.deleted),
+    action: cards.filter(
+      (card) =>
+        card.category === "action" &&
+        !card.deleted &&
+        (!card.customFields || Object.keys(card.customFields).length === 0)
+    ),
   };
   const activeParticipants = participants.filter(
     (p) => Date.now() - p.lastActive < 60000 // Active within 2 minutes
@@ -227,7 +241,8 @@ export const RetroBoard: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Cards by Category */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
+              {/* Default Categories */}
               {/* Start Cards */}
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-4 shadow-lg border-l-4 border-green-500">
@@ -238,7 +253,7 @@ export const RetroBoard: React.FC = () => {
                     category="start"
                     onAddCard={handleAddCard}
                     userName={userName}
-                    customFields={room.customFields}
+                    customFields={[]} 
                   />
                 </div>
                 <div className="space-y-4">
@@ -284,7 +299,7 @@ export const RetroBoard: React.FC = () => {
                     category="stop"
                     onAddCard={handleAddCard}
                     userName={userName}
-                    customFields={room.customFields}
+                    customFields={[]}
                   />
                 </div>
                 <div className="space-y-4">
@@ -330,7 +345,7 @@ export const RetroBoard: React.FC = () => {
                     category="action"
                     onAddCard={handleAddCard}
                     userName={userName}
-                    customFields={room.customFields}
+                    customFields={[]}
                   />
                 </div>
                 <div className="space-y-4">
@@ -365,6 +380,61 @@ export const RetroBoard: React.FC = () => {
                   )}
                 </div>
               </div>
+
+              {/* Custom Field Columns */}
+              {room.customFields.map((field) => (
+                <div key={field.id} className="space-y-4">
+                  <div className="bg-white rounded-xl p-4 shadow-lg border-l-4 border-blue-500">
+                    <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center">
+                      {field.name} ({getCustomFieldCards(field.id).length})
+                    </h2>
+                    <AddCardForm
+                      category="action"
+                      onAddCard={(text, category, customFields) => {
+                        const updatedFields = { ...customFields, [field.id]: text };
+                        handleAddCard(
+                          text,
+                          category,
+                          updatedFields
+                        );
+                      }}
+                      userName={userName}
+                      customFields={[]}
+                    />
+                  </div>
+                  <div className="space-y-4">
+                    {getCustomFieldCards(field.id).map((card) => (
+                      <RetroCard
+                        key={card.id}
+                        card={card}
+                        onVote={handleVoteCard}
+                        currentUser={userId}
+                        isCreator={isCreator}
+                        showAuthorToCreator={room.settings.showAuthorToCreator}
+                        onEdit={
+                          card.authorId === userId ? handleEditCard : undefined
+                        }
+                        onDelete={handleDeleteCard}
+                        votingEnabled={
+                          room.settings.showTimerVoting &&
+                          !!room.timer?.isRunning &&
+                          !room.timer?.isEnded
+                        }
+                      />
+                    ))}
+                    {getCustomFieldCards(field.id).length === 0 && (
+                      <div className="bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl p-6 text-center">
+                        <p className="text-blue-600 font-medium">
+                          No cards for "{field.name}" yet
+                        </p>
+                        <p className="text-blue-500 text-sm mt-1">
+                          Add cards for this "{field.name}" field
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
