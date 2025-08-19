@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Settings, Plus, X, Save, SortAsc, SortDesc } from "lucide-react";
+import { Settings, Plus, X, Save, SortAsc, SortDesc,Pencil, Check ,X as Close } from "lucide-react";
 import { Room, CustomField } from "../types";
 
 interface CreatorControlsProps {
@@ -21,6 +21,15 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
     required: false,
   });
   const [showAddField, setShowAddField] = useState(false);
+    const [editingName, setEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(room.name);
+
+  const handleSaveName = () => {
+    if (editedName.trim() && editedName !== room.name) {
+      onUpdateRoom({ name: editedName.trim() });
+    }
+    setEditingName(false);
+  };
 
   const handleAddCustomField = () => {
     if (!newField.name?.trim()) return;
@@ -91,6 +100,47 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
         </div>
 
         <div className="p-6 space-y-6">
+             {/* Board Name Editable */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Board Name
+            </label>
+            <div className="flex items-center space-x-2">
+              {editingName ? (
+                <>
+                  <input
+                    type="text"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editedName}
+                    onChange={e => setEditedName(e.target.value)}
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleSaveName}
+                    className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => { setEditingName(false); setEditedName(room.name); }}
+                    className="p-2 text-gray-500 hover:bg-gray-100 rounded transition-colors"
+                  >
+                    <Close className="w-4 h-4" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="text-xl font-semibold text-gray-900">{room.name}</span>
+                  <button
+                    onClick={() => setEditingName(true)}
+                    className="p-2 text-gray-500 hover:bg-gray-100 rounded transition-colors"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
           {/* Sorting Controls */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">

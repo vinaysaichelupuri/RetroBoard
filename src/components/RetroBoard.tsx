@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Users as UsersIcon, RefreshCw, Crown } from "lucide-react";
-
 import { useRetroCards, useParticipants, useRoom } from "../hooks/useFirestore";
 import { RetroCard } from "./RetroCard";
 import { AddCardForm } from "./AddCardForm";
