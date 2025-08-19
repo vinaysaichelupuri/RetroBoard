@@ -169,7 +169,7 @@ export const RetroBoard: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between relative">
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center">
                   <img
@@ -201,7 +201,7 @@ export const RetroBoard: React.FC = () => {
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-gray-900">
                   {room.name || "Untitled Board"}
                 </h1>
               </div>
