@@ -55,13 +55,11 @@ export const RetroBoard: React.FC = () => {
     }
     setUserId(storedId);
 
-    // Check if user name is stored in localStorage
     const storedName = localStorage.getItem(`retroboard_name_${roomId}`);
     if (storedName) {
       setUserName(storedName);
     }
 
-    // Check if user is stored as creator
     const storedCreatorId = localStorage.getItem(
       `retroboard_creator_${roomId}`
     );
@@ -71,7 +69,6 @@ export const RetroBoard: React.FC = () => {
   }, [roomId]);
 
   useEffect(() => {
-    // Set creator if room has no creator yet
     if (room && !room.creatorId && userId && userName) {
       setCreator(userId);
       setIsCreator(true);
@@ -82,7 +79,7 @@ export const RetroBoard: React.FC = () => {
   }, [room, userId, userName, roomId, setCreator]);
   const handleNameSubmit = (name: string, boardNameInput?: string) => {
     setUserName(name);
-    localStorage.setItem(`retroboard_name_${roomId}`, name);
+    localStorage.setItem(`retroboard_name_${roomId}`, boardNameInput||'');
     if (boardNameInput) {
       updateRoom({ name: boardNameInput });
     }
