@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Settings, Plus, X, Save, SortAsc, SortDesc,Pencil, Check ,X as Close , Info} from "lucide-react";
+import { Settings, X, Save, SortAsc, SortDesc,Pencil, Check ,X as Close} from "lucide-react";
 import { Room, CustomField } from "../types";
 
 interface CreatorControlsProps {
@@ -72,6 +72,8 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
       },
     });
   };
+
+  const maxCustomFields = 2;
 
   if (!isVisible) {
     return (
@@ -178,15 +180,15 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
           {/* Custom Fields */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Custom Fields
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900">Custom Fields</h3>
               <button
+                className={`px-3 py-1 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition ${
+                  room.customFields.length >= maxCustomFields ? "opacity-50 cursor-not-allowed" : ""
+                }`}
                 onClick={() => setShowAddField(true)}
-                className="flex items-center space-x-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                disabled={room.customFields.length >= maxCustomFields}
               >
-                <Plus className="w-4 h-4" />
-                <span>Add Field</span>
+                Add Field
               </button>
             </div>
 
