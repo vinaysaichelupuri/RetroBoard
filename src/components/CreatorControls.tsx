@@ -39,7 +39,9 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
       name: newField.name.trim(),
       type: newField.type || "text",
       required: newField.required || false,
-      options: newField.type === "select" ? newField.options : undefined,
+      ...(newField.type === "select" && newField.options
+        ? { options: newField.options }
+        : {}),
     };
 
     onUpdateRoom({

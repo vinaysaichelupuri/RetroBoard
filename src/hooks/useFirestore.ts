@@ -202,8 +202,13 @@ export const useRoom = (roomId: string) => {
   const updateRoom = async (updates: Partial<Room>) => {
     if (!roomId) return;
 
+    // Remove undefined fields from updates
+    const filteredUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([, v]) => v !== undefined)
+    );
+
     const roomRef = doc(db, "rooms", roomId);
-    await updateDoc(roomRef, updates);
+    await updateDoc(roomRef, filteredUpdates);
   };
 
   const setCreator = async (creatorId: string) => {
