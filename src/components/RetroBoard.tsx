@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Users as UsersIcon, RefreshCw, Crown, Info } from "lucide-react";
+import { Users as UsersIcon, RefreshCw, Crown, Info, Pencil, Check, X as Close } from "lucide-react";
 import { useRetroCards, useParticipants, useRoom } from "../hooks/useFirestore";
-import { RetroCard } from "./RetroCard";
 import { AddCardForm } from "./AddCardForm";
 import { NamePrompt } from "./NamePrompt";
 import { CreatorControls } from "./CreatorControls";
@@ -19,6 +18,10 @@ export const RetroBoard: React.FC = () => {
   const [showCreatorControls, setShowCreatorControls] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<RetroCardType | null>(null);
+  const [editingDefaultField, setEditingDefaultField] = useState<string | null>(null);
+  const [defaultFieldNameInput, setDefaultFieldNameInput] = useState<string>("");
+  const [editingCustomFieldId, setEditingCustomFieldId] = useState<string | null>(null);
+  const [customFieldNameInput, setCustomFieldNameInput] = useState<string>("");
 
   const {
     room,
@@ -119,6 +122,49 @@ export const RetroBoard: React.FC = () => {
     cards.filter(
       (card) => card.customFields && card.customFields[fieldId] && !card.deleted
     );
+
+  // Edit default field name
+  const handleEditDefaultFieldName = (fieldKey: "start" | "stop" | "action") => {
+    setEditingDefaultField(fieldKey);
+    setDefaultFieldNameInput(room?.settings?.defaultFieldNames?.[fieldKey] || getDefaultFieldLabel(fieldKey));
+  };
+
+  const handleSaveDefaultFieldName = (fieldKey: "start" | "stop" | "action") => {
+    if (!room) return;
+    updateRoom({
+      settings: {
+        ...room.settings,
+        defaultFieldNames: {
+          ...room.settings.defaultFieldNames,
+          [fieldKey]: defaultFieldNameInput,
+        },
+      },
+    });
+    setEditingDefaultField(null);
+  };
+
+  // Edit custom field name
+  const handleEditCustomFieldName = (fieldId: string, fieldName: string) => {
+    setEditingCustomFieldId(fieldId);
+    setCustomFieldNameInput(fieldName);
+  };
+
+  const handleSaveCustomFieldName = (fieldId: string) => {
+    if (!room) return;
+    const updatedFields = room.customFields.map(f =>
+      f.id === fieldId ? { ...f, name: customFieldNameInput } : f
+    );
+    updateRoom({ customFields: updatedFields });
+    setEditingCustomFieldId(null);
+  };
+
+  const getDefaultFieldLabel = (key: "start" | "stop" | "action") => {
+    if (room && room.settings.defaultFieldNames?.[key]) return room.settings.defaultFieldNames[key];
+    if (key === "start") return "Went well";
+    if (key === "stop") return "Not went well";
+    if (key === "action") return "Action items";
+    return "";
+  };
 
   if (
     !userName ||
@@ -259,8 +305,41 @@ export const RetroBoard: React.FC = () => {
               {/* Went Well */}
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-4 shadow-lg border-l-4 border-green-500">
-                  <h2 className="text-xl font-bold text-green-700 mb-4">
-                    Went well ({categorizedCards.start.length})
+                  <h2 className="text-xl font-bold mb-4 flex items-center">
+                    {editingDefaultField === "start" ? (
+                      <div className="flex items-center gap-2 w-full">
+                        <input
+                          type="text"
+                          value={defaultFieldNameInput}
+                          onChange={e => setDefaultFieldNameInput(e.target.value)}
+                          className="px-2 py-1 border rounded w-[140px] max-w-full"
+                        />
+                        <button
+                          onClick={() => handleSaveDefaultFieldName("start")}
+                          className="text-green-600 bg-white rounded p-1 hover:bg-green-50"
+                        >
+                          <Check className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setEditingDefaultField(null)}
+                          className="text-gray-500 bg-white rounded p-1 hover:bg-gray-100"
+                        >
+                          <Close className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {getDefaultFieldLabel("start")} ({categorizedCards.start.length})
+                        {isCreator && (
+                          <button
+                            onClick={() => handleEditDefaultFieldName("start")}
+                            className="ml-2 text-gray-400 hover:text-blue-600"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                        )}
+                      </>
+                    )}
                   </h2>
                   <AddCardForm
                     category="start"
@@ -275,8 +354,41 @@ export const RetroBoard: React.FC = () => {
               {/* Not Went Well */}
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-4 shadow-lg border-l-4 border-red-500">
-                  <h2 className="text-xl font-bold text-red-700 mb-4">
-                    Not went well ({categorizedCards.stop.length})
+                  <h2 className="text-xl font-bold mb-4 flex items-center">
+                    {editingDefaultField === "stop" ? (
+                      <div className="flex items-center gap-2 w-full">
+                        <input
+                          type="text"
+                          value={defaultFieldNameInput}
+                          onChange={e => setDefaultFieldNameInput(e.target.value)}
+                          className="px-2 py-1 border rounded w-[140px] max-w-full"
+                        />
+                        <button
+                          onClick={() => handleSaveDefaultFieldName("stop")}
+                          className="text-green-600 bg-white rounded p-1 hover:bg-green-50"
+                        >
+                          <Check className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setEditingDefaultField(null)}
+                          className="text-gray-500 bg-white rounded p-1 hover:bg-gray-100"
+                        >
+                          <Close className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {getDefaultFieldLabel("stop")} ({categorizedCards.stop.length})
+                        {isCreator && (
+                          <button
+                            onClick={() => handleEditDefaultFieldName("stop")}
+                            className="ml-2 text-gray-400 hover:text-blue-600"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                        )}
+                      </>
+                    )}
                   </h2>
                   <AddCardForm
                     category="stop"
@@ -291,8 +403,41 @@ export const RetroBoard: React.FC = () => {
               {/* Action Items */}
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-4 shadow-lg border-l-4 border-blue-500">
-                  <h2 className="text-xl font-bold text-blue-700 mb-4">
-                    Action items ({categorizedCards.action.length})
+                  <h2 className="text-xl font-bold mb-4 flex items-center">
+                    {editingDefaultField === "action" ? (
+                      <div className="flex items-center gap-2 w-full">
+                        <input
+                          type="text"
+                          value={defaultFieldNameInput}
+                          onChange={e => setDefaultFieldNameInput(e.target.value)}
+                          className="px-2 py-1 border rounded w-[140px] max-w-full"
+                        />
+                        <button
+                          onClick={() => handleSaveDefaultFieldName("action")}
+                          className="text-green-600 bg-white rounded p-1 hover:bg-green-50"
+                        >
+                          <Check className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setEditingDefaultField(null)}
+                          className="text-gray-500 bg-white rounded p-1 hover:bg-gray-100"
+                        >
+                          <Close className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {getDefaultFieldLabel("action")} ({categorizedCards.action.length})
+                        {isCreator && (
+                          <button
+                            onClick={() => handleEditDefaultFieldName("action")}
+                            className="ml-2 text-gray-400 hover:text-blue-600"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                        )}
+                      </>
+                    )}
                   </h2>
                   <AddCardForm
                     category="action"
@@ -308,8 +453,41 @@ export const RetroBoard: React.FC = () => {
               {room.customFields.map((field) => (
                 <div key={field.id} className="space-y-4">
                   <div className="bg-white rounded-xl p-4 shadow-lg border-l-4 border-blue-500">
-                    <h2 className="text-xl font-bold text-blue-700 mb-4">
-                      {field.name} ({getCustomFieldCards(field.id).length})
+                    <h2 className="text-xl font-bold mb-4 flex items-center">
+                      {editingCustomFieldId === field.id ? (
+                        <div className="flex items-center gap-2 w-full">
+                          <input
+                            type="text"
+                            value={customFieldNameInput}
+                            onChange={e => setCustomFieldNameInput(e.target.value)}
+                            className="px-2 py-1 border rounded w-[140px] max-w-full"
+                          />
+                          <button
+                            onClick={() => handleSaveCustomFieldName(field.id)}
+                            className="text-green-600 bg-white rounded p-1 hover:bg-green-50"
+                          >
+                            <Check className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => setEditingCustomFieldId(null)}
+                            className="text-gray-500 bg-white rounded p-1 hover:bg-gray-100"
+                          >
+                            <Close className="w-5 h-5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          {field.name} ({getCustomFieldCards(field.id).length})
+                          {isCreator && (
+                            <button
+                              onClick={() => handleEditCustomFieldName(field.id, field.name)}
+                              className="ml-2 text-gray-400 hover:text-blue-600"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                          )}
+                        </>
+                      )}
                     </h2>
                     <AddCardForm
                       category="action"
