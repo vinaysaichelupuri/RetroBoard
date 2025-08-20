@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Settings, Plus, X, Save, SortAsc, SortDesc,Pencil, Check ,X as Close , Info} from "lucide-react";
+import { Settings, X, Save, SortAsc, SortDesc,Pencil, Check ,X as Close} from "lucide-react";
 import { Room, CustomField } from "../types";
 
 interface CreatorControlsProps {
@@ -21,8 +21,9 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
     required: false,
   });
   const [showAddField, setShowAddField] = useState(false);
-    const [editingName, setEditingName] = useState(false);
+  const [editingName, setEditingName] = useState(false);
   const [editedName, setEditedName] = useState(room.name);
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
 
   const handleSaveName = () => {
     if (editedName.trim() && editedName !== room.name) {
@@ -32,6 +33,10 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
   };
 
   const handleAddCustomField = () => {
+    if (room.customFields.length >= maxCustomFields) {
+      setAlertMsg("Only 2 custom fields can be added.");
+      return;
+    }
     if (!newField.name?.trim()) return;
 
     const field: CustomField = {
@@ -50,6 +55,7 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
 
     setNewField({ name: "", type: "text", required: false });
     setShowAddField(false);
+    setAlertMsg(null);
   };
 
   const handleRemoveField = (fieldId: string) => {
@@ -72,6 +78,8 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
       },
     });
   };
+
+  const maxCustomFields = 2;
 
   if (!isVisible) {
     return (
@@ -177,16 +185,34 @@ export const CreatorControls: React.FC<CreatorControlsProps> = ({
 
           {/* Custom Fields */}
           <div>
+            {/* Alert message */}
+            {alertMsg && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg flex items-center justify-between">
+                <span>{alertMsg}</span>
+                <button
+                  onClick={() => setAlertMsg(null)}
+                  className="ml-2 text-red-500 hover:text-red-700"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Custom Fields
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900">Custom Fields</h3>
               <button
-                onClick={() => setShowAddField(true)}
-                className="flex items-center space-x-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                className={`px-3 py-1 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition ${
+                  room.customFields.length >= maxCustomFields ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                onClick={() => {
+                  if (room.customFields.length >= maxCustomFields) {
+                    setAlertMsg("Only 2 custom fields can be added.");
+                  } else {
+                    setShowAddField(true);
+                  }
+                }}
+                disabled={room.customFields.length >= maxCustomFields}
               >
-                <Plus className="w-4 h-4" />
-                <span>Add Field</span>
+                Add Field
               </button>
             </div>
 

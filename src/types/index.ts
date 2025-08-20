@@ -49,4 +49,9 @@ export interface RoomSettings {
   showAuthorToCreator: boolean;
   sortBy: 'timestamp' | 'votes' | 'author';
   sortOrder: 'asc' | 'desc';
+  defaultFieldNames?: {
+    start?: string;
+    stop?: string;
+    action?: string;
+  };
 }
